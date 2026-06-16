@@ -14,13 +14,24 @@ import { SeedModule } from './seed/seed.module';
       envFilePath: '../../.env',
     }),
     TypeOrmModule.forRootAsync({
-      useFactory: (config: ConfigService) => ({
-        type: 'better-sqlite3' as any,
-        database:
-          config.get<string>('DATABASE_URL') || './data/booking.db',
-        entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // dev only
-      }),
+      useFactory: (config: ConfigService) => {
+        const dbType = config.get<string>('DATABASE_TYPE', 'better-sqlite3');
+        if (dbType === 'postgres') {
+          return {
+            type: 'postgres',
+            url: config.get<string>('DATABASE_URL'),
+            entities: [__dirname + '/**/*.entity{.ts,.js}'],
+            synchronize: true,
+            ssl: { rejectUnauthorized: false },
+          };
+        }
+        return {
+          type: 'better-sqlite3',
+          database: config.get<string>('DATABASE_URL') || './data/booking.db',
+          entities: [__dirname + '/**/*.entity{.ts,.js}'],
+          synchronize: true,
+        };
+      },
       inject: [ConfigService],
     }),
     BusinessModule,
