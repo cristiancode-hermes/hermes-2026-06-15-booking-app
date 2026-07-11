@@ -14,7 +14,7 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class ApiService {
   private readonly http = inject(HttpClient);
-  private readonly baseUrl = 'http://localhost:3000/api';
+  private readonly baseUrl = '/api';
 
   // ── Businesses ──────────────────────────────────────────────
 
